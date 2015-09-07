@@ -18,15 +18,15 @@ class RoachRegisterWidget(QtGui.QWidget):
         self.layout().addWidget(self.lineEdit)
 
         self.writeButton = QtGui.QPushButton()
-        self.writeButton.setText("Write Register")
+        self.writeButton.setText("Write")
         self.layout().addWidget(self.writeButton)
 
         self.toggleButton = QtGui.QPushButton()
-        self.toggleButton.setText("Toggle Register")
+        self.toggleButton.setText("Toggle")
         self.layout().addWidget(self.toggleButton)
 
         self.pulseButton = QtGui.QPushButton()
-        self.pulseButton.setText("Pulse register")
+        self.pulseButton.setText("Pulse")
         self.layout().addWidget(self.pulseButton)
 
         self.register = register
