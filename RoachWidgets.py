@@ -35,8 +35,8 @@ class RoachRegisterWidget(QtGui.QWidget):
         QtCore.QObject.connect(self.writeButton, QtCore.SIGNAL("clicked()"), self.writeRegister)
         QtCore.QObject.connect(self.toggleButton, QtCore.SIGNAL("clicked()"), self.toggleRegister)
         QtCore.QObject.connect(self.pulseButton, QtCore.SIGNAL("clicked()"), self.pulseRegister)
+        QtCore.QObject.connect(self.lineEdit, QtCore.SIGNAL("textEdited(QString)"), self.stopTimer)
 
-        print "RoachRegisterWidget initialised."
         self.runTimer()
 
     def readRegister(self):
@@ -45,9 +45,11 @@ class RoachRegisterWidget(QtGui.QWidget):
 
     def writeRegister(self):
         dataToWrite = self.lineEdit.text()
-        dataToWrite = "".join(c for c in setText if c.isdigit())
+        dataToWrite = "".join(c for c in str(self.lineEdit.text()) if c.isdigit())
         writeArg = {self.regKey:int(dataToWrite)}
         self.register.write(**writeArg) # I love python :)
+        if not self.timer.isActive():
+            self.runTimer()
 
     def toggleRegister(self):
         writeArg = {self.regKey:"toggle"}
@@ -61,6 +63,9 @@ class RoachRegisterWidget(QtGui.QWidget):
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.readRegister)
         self.timer.start(200)
+
+    def stopTimer(self):
+        self.timer.stop()
 
 
 class RoachLoaderWidget(QtGui.QWidget):
@@ -87,7 +92,6 @@ class RoachLoaderWidget(QtGui.QWidget):
 
         QtCore.QObject.connect(self.getFPGButton, QtCore.SIGNAL("clicked()"), self.getFPG)
 
-        print "RoachLoaderWidget initialised."
 
     def getFPG(self):
         self.fpgFile = QtGui.QFileDialog.getOpenFileName(self, 'Open FPG file', '.')
