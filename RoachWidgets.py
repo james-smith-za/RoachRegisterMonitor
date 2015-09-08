@@ -37,6 +37,7 @@ class RoachRegisterWidget(QtGui.QWidget):
         QtCore.QObject.connect(self.toggleButton, QtCore.SIGNAL("clicked()"), self.toggleRegister)
         QtCore.QObject.connect(self.pulseButton, QtCore.SIGNAL("clicked()"), self.pulseRegister)
         QtCore.QObject.connect(self.lineEdit, QtCore.SIGNAL("textEdited(QString)"), self.stopTimer)
+        QtCore.QObject.connect(self.lineEdit, QtCore.SIGNAL("selectionChanged()"), self.stopTimer)
         QtCore.QObject.connect(self.lineEdit, QtCore.SIGNAL("returnPressed()"), self.writeRegister)
 
         self.timerLength = 200
