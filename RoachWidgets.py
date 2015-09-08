@@ -10,7 +10,8 @@ class RoachRegisterWidget(QtGui.QWidget):
         self.setLayout(QtGui.QHBoxLayout())
 
         self.label = QtGui.QLabel()
-        self.label.setText("{0}:{1}".format(getattr(register, "name"), regKey))
+        self.regName = "{0}:{1}".format(getattr(register, "name"), regKey)
+        self.label.setText(self.regName)
         self.layout().addWidget(self.label)
 
         self.lineEdit = QtGui.QLineEdit()
@@ -37,6 +38,8 @@ class RoachRegisterWidget(QtGui.QWidget):
         QtCore.QObject.connect(self.pulseButton, QtCore.SIGNAL("clicked()"), self.pulseRegister)
         QtCore.QObject.connect(self.lineEdit, QtCore.SIGNAL("textEdited(QString)"), self.stopTimer)
 
+        self.timerLength = 200
+
         self.runTimer()
 
     def readRegister(self):
@@ -62,10 +65,24 @@ class RoachRegisterWidget(QtGui.QWidget):
     def runTimer(self):
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.readRegister)
-        self.timer.start(200)
+        self.timer.start(self.timerLength)
 
     def stopTimer(self):
         self.timer.stop()
+
+    def filterWidget(self, filterString):
+        if str(filterString) in str(self.regName):
+            self.setEnabled(True)
+            self.setVisible(True)
+            self.runTimer()
+        elif filterString == "":
+            self.setEnabled(True)
+            self.setVisible(True)
+            self.runTimer()
+        else:
+            self.setEnabled(False)
+            self.setVisible(False)
+            self.stopTimer()
 
 
 class RoachLoaderWidget(QtGui.QWidget):
@@ -111,11 +128,14 @@ class RoachRegisterMonitor(QtGui.QWidget):
         self.layout().addWidget(self.connectButton)
 
         self.filterLineEdit = QtGui.QLineEdit()
-        self.filterLineEdit.setText("Filtering feature not yet implemented")
+        self.filterLineEdit.setText("")
         self.filterLineEdit.setDisabled(True)
         self.layout().addWidget(self.filterLineEdit)
 
         QtCore.QObject.connect(self.connectButton, QtCore.SIGNAL("clicked()"), self.connectToRoach)
+        QtCore.QObject.connect(self.filterLineEdit, QtCore.SIGNAL("textEdited(QString)"), self.filterList)
+
+        self.widgetList = []
 
     def connectToRoach(self):
         self.fpga = casperfpga.katcp_fpga.KatcpFpga(str(self.roachLoader.lineEdit.text()))
@@ -124,7 +144,6 @@ class RoachRegisterMonitor(QtGui.QWidget):
         regNameList = [reg for reg in dir(self.fpga.registers) if reg[0] != '_']
         self.registerList = [getattr(self.fpga.registers, reg) for reg in regNameList if type(getattr(self.fpga.registers, reg)) == casperfpga.register.Register]
 
-        self.widgetList = []
 
         for reg in self.registerList:
             regValue = reg.read()
@@ -137,6 +156,13 @@ class RoachRegisterMonitor(QtGui.QWidget):
                     newReg = RoachRegisterWidget(reg, key)
                     self.widgetList.append(newReg)
                     self.layout().addWidget(self.widgetList[-1])
+
+        self.filterLineEdit.setEnabled(True)
+
+    def filterList(self):
+        for widget in self.widgetList:
+            widget.filterWidget(str(self.filterLineEdit.text()))
+
 
 
 
