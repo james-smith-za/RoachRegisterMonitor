@@ -37,6 +37,7 @@ class RoachRegisterWidget(QtGui.QWidget):
         QtCore.QObject.connect(self.toggleButton, QtCore.SIGNAL("clicked()"), self.toggleRegister)
         QtCore.QObject.connect(self.pulseButton, QtCore.SIGNAL("clicked()"), self.pulseRegister)
         QtCore.QObject.connect(self.lineEdit, QtCore.SIGNAL("textEdited(QString)"), self.stopTimer)
+        QtCore.QObject.connect(self.lineEdit, QtCore.SIGNAL("returnPressed()"), self.writeRegister)
 
         self.timerLength = 200
 
@@ -54,6 +55,7 @@ class RoachRegisterWidget(QtGui.QWidget):
         if not self.timer.isActive():
             self.runTimer()
 
+
     def toggleRegister(self):
         writeArg = {self.regKey:"toggle"}
         self.register.write(**writeArg)
@@ -66,23 +68,25 @@ class RoachRegisterWidget(QtGui.QWidget):
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.readRegister)
         self.timer.start(self.timerLength)
+        self.lineEdit.setStyleSheet("")
 
     def stopTimer(self):
         self.timer.stop()
+        self.lineEdit.setStyleSheet("border: 1px solid red;")
 
     def filterWidget(self, filterString):
         if str(filterString) in str(self.regName):
             self.setEnabled(True)
             self.setVisible(True)
-            self.runTimer()
+            self.timer.run(self.timerLength)
         elif filterString == "":
             self.setEnabled(True)
             self.setVisible(True)
-            self.runTimer()
+            self.timer.run(self.timerLength)
         else:
             self.setEnabled(False)
             self.setVisible(False)
-            self.stopTimer()
+            self.timer.stop()
 
 
 class RoachLoaderWidget(QtGui.QWidget):
@@ -100,7 +104,7 @@ class RoachLoaderWidget(QtGui.QWidget):
         self.layout().addWidget(self.lineEdit)
 
         self.getFPGButton = QtGui.QPushButton()
-        self.getFPGButton.setText("Get FPG file")
+        self.getFPGButton.setText("Browse (for FPG)")
         self.layout().addWidget(self.getFPGButton)
 
         self.fpgName = QtGui.QLineEdit()

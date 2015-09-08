@@ -3,8 +3,6 @@ from PyQt4 import QtGui, QtCore
 
 from RoachWidgets import RoachRegisterWidget, RoachLoaderWidget, RoachRegisterMonitor
 
-import casperfpga
-
 class myWindow(QtGui.QMainWindow):
 
     def __init__(self):
