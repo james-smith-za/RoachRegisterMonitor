@@ -78,11 +78,11 @@ class RoachRegisterWidget(QtGui.QWidget):
         if str(filterString) in str(self.regName):
             self.setEnabled(True)
             self.setVisible(True)
-            self.timer.run(self.timerLength)
+            self.timer.start(self.timerLength)
         elif filterString == "":
             self.setEnabled(True)
             self.setVisible(True)
-            self.timer.run(self.timerLength)
+            self.timer.start(self.timerLength)
         else:
             self.setEnabled(False)
             self.setVisible(False)
