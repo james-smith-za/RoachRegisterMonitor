@@ -5,7 +5,7 @@ from RoachWidgets import RoachRegisterWidget, RoachLoaderWidget
 
 import casperfpga
 
-class RoachRegisterMonitor(QtGui.QWidget):
+class RoachRegisterMonitor(QtGui.QMainWindow):
     def __init__(self):
         super(RoachRegisterMonitor, self).__init__()
 
