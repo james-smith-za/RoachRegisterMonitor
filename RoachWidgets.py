@@ -56,7 +56,7 @@ class RoachRegisterWidget(QtGui.QWidget):
         QtCore.QObject.connect(self.writeButton, QtCore.SIGNAL("clicked()"), self.writeRegister)
         QtCore.QObject.connect(self.toggleButton, QtCore.SIGNAL("clicked()"), self.toggleRegister)
         QtCore.QObject.connect(self.pulseButton, QtCore.SIGNAL("clicked()"), self.pulseRegister)
-        QtCore.QObject.connect(self.spinBox, QtCore.SIGNAL("valueChanged(int)", self.writeRegister)
+        QtCore.QObject.connect(self.spinBox, QtCore.SIGNAL("valueChanged(int)"), self.writeRegister)
 
         self.timerLength = 200
 
