@@ -36,7 +36,7 @@ class RoachRegisterWidget(QtGui.QWidget):
 
         self.spinBox = QtGui.QSpinBox()
         self.spinBox.setValue(0)
-        self.spinBox.setMaximum(2**32)
+        self.spinBox.setMaximum(2**31 - 1)
         self.spinBox.setMinimum(0)
         self.layout().addWidget(self.spinBox)
 
