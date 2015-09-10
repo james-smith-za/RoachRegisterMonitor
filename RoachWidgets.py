@@ -29,6 +29,11 @@ class RoachRegisterWidget(QtGui.QWidget):
 
         self.setLayout(QtGui.QHBoxLayout())
 
+        self.checkBox = QtGui.QCheckBox()
+        self.checkBox.setCheckState(False)
+        self.checkBox.setText("")
+        self.layout().addWidget(self.checkBox)
+
         self.label = QtGui.QLabel()
         self.regName = "{0}:{1}".format(getattr(register, "name"), regKey)
         self.label.setText(self.regName)
@@ -58,9 +63,9 @@ class RoachRegisterWidget(QtGui.QWidget):
         QtCore.QObject.connect(self.writeButton, QtCore.SIGNAL("clicked()"), self.writeRegister)
         QtCore.QObject.connect(self.toggleButton, QtCore.SIGNAL("clicked()"), self.toggleRegister)
         QtCore.QObject.connect(self.pulseButton, QtCore.SIGNAL("clicked()"), self.pulseRegister)
-        QtCore.QObject.connect(self.spinBox, QtCore.SIGNAL("valueChanged(int)"), self.writeRegister)
+        QtCore.QObject.connect(self.spinBox, QtCore.SIGNAL("editingFinished()"), self.writeRegister)
 
-        self.timerLength = 200
+        self.timerLength = 250
 
         self.runTimer()
 
@@ -99,11 +104,7 @@ class RoachRegisterWidget(QtGui.QWidget):
 
     def filterWidget(self, filterString):
         """Decide whether to show or hide the register based on the given filter string."""
-        if str(filterString) in str(self.regName):
-            self.setEnabled(True)
-            self.setVisible(True)
-            self.timer.start(self.timerLength)
-        elif filterString == "":
+        if str(filterString) in str(self.regName) or filterString == "" or self.checkBox.checkState():
             self.setEnabled(True)
             self.setVisible(True)
             self.timer.start(self.timerLength)
