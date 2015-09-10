@@ -39,11 +39,9 @@ class RoachRegisterWidget(QtGui.QWidget):
         self.label.setText(self.regName)
         self.layout().addWidget(self.label)
 
-        self.spinBox = QtGui.QSpinBox()
-        self.spinBox.setValue(0)
-        self.spinBox.setMaximum(2**31 - 1)
-        self.spinBox.setMinimum(0)
-        self.layout().addWidget(self.spinBox)
+        self.lineEdit = QtGui.QLineEdit()
+        self.lineEdit.setText("0")
+        self.layout().addWidget(self.lineEdit)
 
         self.writeButton = QtGui.QPushButton()
         self.writeButton.setText("Write")
@@ -63,7 +61,9 @@ class RoachRegisterWidget(QtGui.QWidget):
         QtCore.QObject.connect(self.writeButton, QtCore.SIGNAL("clicked()"), self.writeRegister)
         QtCore.QObject.connect(self.toggleButton, QtCore.SIGNAL("clicked()"), self.toggleRegister)
         QtCore.QObject.connect(self.pulseButton, QtCore.SIGNAL("clicked()"), self.pulseRegister)
-        QtCore.QObject.connect(self.spinBox, QtCore.SIGNAL("editingFinished()"), self.writeRegister)
+        QtCore.QObject.connect(self.lineEdit, QtCore.SIGNAL("textEdited(QString)"), self.stopTimer)
+        QtCore.QObject.connect(self.lineEdit, QtCore.SIGNAL("selectionChanged()"), self.stopTimer)
+        QtCore.QObject.connect(self.lineEdit, QtCore.SIGNAL("returnPressed()"), self.writeRegister)
 
         self.timerLength = 250
 
@@ -72,12 +72,13 @@ class RoachRegisterWidget(QtGui.QWidget):
     def readRegister(self):
         """Read the value from the register and set the line edit's text."""
         registerValue = int(self.register.read()["data"][self.regKey])
-        self.spinBox.setValue(int(registerValue))
+        self.lineEdit.setText(str(registerValue))
 
     def writeRegister(self):
         """Write the line edit's text to the corresponding register."""
-        dataToWrite = int(self.spinBox.value())
-        writeArg = {self.regKey:dataToWrite}
+        dataToWrite = self.lineEdit.text()
+        dataToWrite = "".join(c for c in str(self.lineEdit.text()) if c.isdigit())
+        writeArg = {self.regKey:int(dataToWrite)}
         self.register.write(**writeArg) # I love python :)
         if not self.timer.isActive():
             self.runTimer()
@@ -97,10 +98,12 @@ class RoachRegisterWidget(QtGui.QWidget):
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.readRegister)
         self.timer.start(self.timerLength)
+        self.lineEdit.setStyleSheet("")
 
     def stopTimer(self):
         """Stop the timer for polling the register. Highlight the line edit to indicate data not yet written."""
         self.timer.stop()
+        self.lineEdit.setStyleSheet("border: 1px solid red;")
 
     def filterWidget(self, filterString):
         """Decide whether to show or hide the register based on the given filter string."""
